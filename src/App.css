@@ -9,7 +9,7 @@
 
 .just-lines {
   margin: auto;
-  background-color: black;
+  background-color: darkgrey;
   width: 590px;
   height: 590px;
 }
@@ -28,4 +28,5 @@
   height: 190px;
   width: 190px;
   background-color: white;
+  font-size: 9em;
 }

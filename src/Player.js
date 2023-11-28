@@ -1,8 +1,9 @@
-import React from 'react'
 
-export default function Player (name, color) {
+export default function Player (name, color, symbol, isTurn) {
     this.name = name
     this.color = color
+    this.symbol = symbol
+    this.isTurn = isTurn
     this.one = false
     this.two = false
     this.three = false
