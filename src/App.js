@@ -7,10 +7,14 @@ import GridSquare from './components/GridSquare'
 function App() {
 
   let [game, setGame] = useState ({
-    isStarted: false,
+    isStarted: true,
     isOver: false,
     isDraw: false,
-    playerTurn: 'will'
+    playerTurn: '',
+    playerOneCreated: false,
+    playerTwoCreated: false,
+    winningPlayer: '',
+    showReplay: false
   })
   let [grid, setGrid] = useState ({
     one: '',
@@ -23,9 +27,10 @@ function App() {
     eight: '',
     nine: '',
   })
-  let [playerOne, setPlayerOne] = useState(new Player('will', 'green', `🏀`, true))
-  let [playerTwo, setPlayerTwo] = useState(new Player('jeb', 'blue', `🌴`, false))
+  let [playerOne, setPlayerOne] = useState(new Player('will', `🏀`, true))
+  let [playerTwo, setPlayerTwo] = useState(new Player('jeb', `🌴`, false))
   let [turn, setTurn] = useState(0)
+  let symbols = [`X`, `O`, `🏀`, `🌴`, `😃`, `👹`, `🐳`]
 
   // -- click handler for grid squares
   // if the space isn't taken, update player object to give them the square,
@@ -33,7 +38,7 @@ function App() {
   // whose turn it is. then, increment turn. 
   // if the space is taken, do nothing
   let clickHandle = (e) => {
-    if (grid[e.target.id] === '') {
+    if (grid[e.target.id] === '' && game.isOver === false) {
       if (turn % 2 === 0) {
         setPlayerOne({...playerOne, [e.target.id]: true})
         setGrid({...grid, [e.target.id]: playerOne.symbol})
@@ -52,11 +57,14 @@ function App() {
   // for that player
   let checkWin = (player) => {
     let { one, two, three, four, five, six, seven, eight, nine} = player
-
     if ( (one && two && three) || (four && five && six) || (seven && eight && nine) || // check rows
       (one && four && seven) || (two && five && eight ) || (three && six && nine ) || // check columns
       (one && five && nine) || (seven && five && three) ) { // check diagonals
-        console.log(`win for ${player.name}`)
+        setGame({...game, winningPlayer: player.name, isOver: true})
+
+        // setTimeout(()=> {
+        //   setGame({...game, showReplay: true})
+        // }, 2000) // is this firing before the setGame updates or something? second time this has happened
     }
   }
 
@@ -76,22 +84,34 @@ function App() {
       console.log(`somethin else wrong :cringe:`)
   }, [turn])
 
-  // if game hasnt started, render start screen
-  
-  // if game has started, render grid
-  return (
+  // if game isn't ready, render start screen and collect info
+  if (!game.isStarted)
+    return (
     <div className="App">
-      <div className="header-container">
-        <div className="game-name"><p>Tic Tac Toe</p></div>
-        <div className="game-status"><p>It's {game.playerTurn}'s Turn</p></div>
-      </div>
-      <div className="just-lines">
-        <div className="grid-container">
-          {Object.keys(grid).map(number => <GridSquare style='grid-square' id={number} value={grid[number]} click={clickHandle}/>)}
+      <div><h1>Hello, and welcome to Tic Tac Toe</h1></div>
+      <div><h2>The game requires two players.</h2></div>
+
+      <form onSubmit={()=>{console.log('submit')}}>
+        <input placeholder='player 1 please input your player name'></input>
+
+        <button type='submit'>Submit</button>
+      </form>
+
+    </div>)
+  // if game is ready, render grid and play
+  else if (game.isStarted)
+    return (
+      <div className="App">
+        <div className="header-container">
+          {!game.isOver ? <><div className="game-name"><p>Tic Tac Toe</p></div><div className="game-status"><p>It's {game.playerTurn}'s Turn</p></div></> : <div className="game-name"><h1>{game.winningPlayer} wins!!!</h1></div>}
+        </div>
+        <div className="just-lines">
+          <div className="grid-container">
+            {Object.keys(grid).map((number,idx) => <GridSquare style='grid-square' id={number} value={grid[number]} click={clickHandle} key={idx}/>)}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    )
 
   // if game is over, render game over
   // // maybe render a game over thing and wait a few seconds before 

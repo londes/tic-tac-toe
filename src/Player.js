@@ -1,7 +1,6 @@
 
-export default function Player (name, color, symbol, isTurn) {
+export default function Player (name, symbol, isTurn) {
     this.name = name
-    this.color = color
     this.symbol = symbol
     this.isTurn = isTurn
     this.one = false
