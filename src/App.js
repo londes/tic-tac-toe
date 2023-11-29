@@ -101,6 +101,7 @@ function App() {
       eight: '',
       nine: '',
     })
+    setTurn(0)
     setPlayerOne(new Player(playerOne.name, playerOne.symbol, true))
     setPlayerTwo(new Player(playerTwo.name, playerTwo.symbol, false))
   }
@@ -131,6 +132,7 @@ function App() {
     setPlayerTwo(new Player('', '', false))
     setSymbols([`X`, `O`, `🏀`, `🌴`, `😃`, `👹`, `🐳`])
     setMessage('')
+    setTurn(0)
   }
 
   // lets each player choose a symbol 
@@ -148,8 +150,8 @@ function App() {
   // since the setState calls happen asynchronously, we have to
   // watch player 1's name in the form to make sure it's tracked 
   // correctly in the game object for the first turn
-  let changeHandler = () => {
-
+  let changeHandler = (e) => {
+    setPlayerOne({...playerOne, name: e.target.value})
   }
 
   // some brief form validation, if we have both player names
@@ -216,7 +218,7 @@ function App() {
         <div className="player-container">
           <div className="name-input">
             <div>Player 1:</div>
-            <input placeholder='Please input your name'></input>
+            <input placeholder='Please input your name' value={playerOne.name} onChange={changeHandler}></input>
           </div>
           <div className="button-input">
           {playerOne.symbol ? 
@@ -252,7 +254,7 @@ function App() {
       <div className="App">
         <div className="header-container">
           {!game.isOver ? <><div className="game-name"><p>Tic Tac Toe</p></div>
-          <div className="game-status"><p>It's {game.playerTurn}'s Turn</p></div></> : 
+          <div className="game-status"><p>It's {game.playerTurn}'s Turn</p><p>{game.playerTurn === playerOne.name ? playerOne.symbol : playerTwo.symbol}</p></div></> : 
           <div className="game-name"><h1>{game.winningPlayer} wins</h1></div>}
         </div>
         <div className="just-lines">

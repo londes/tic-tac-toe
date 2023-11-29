@@ -47,19 +47,25 @@
   font-size: 3em;
 }
 
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  width: 80vw;
-  font-size: 2em;
-}
-
 .submit-button {
   font-size: 2em;
 }
 
 .message {
   color: red;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-around;
+  width: 80vw;
+  font-size: 2em;
+}
+
+.game-status {
+  display: flex;
+  justify-content: flex-end;
+  width: 40vw;
 }
 
 .header-container > * {
@@ -69,25 +75,25 @@
 .just-lines {
   margin: auto;
   background-color: darkgrey;
-  width: 590px;
-  height: 590px;
+  width: 560px;
+  height: 560px;
 }
 
 .grid-container {
   display: grid;
   margin: auto;
-  grid-template-columns: 200px 200px 200px;
-  grid-template-rows: 200px 200px 200px;
+  grid-template-columns: 190px 190px 190px;
+  grid-template-rows: 190px 190px 190px;
 }
 
 .grid-container > * {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 190px;
-  width: 190px;
+  height: 180px;
+  width: 180px;
   background-color: white;
-  font-size: 9em;
+  font-size: 8em;
 }
 
 .replay-container {
