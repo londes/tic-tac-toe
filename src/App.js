@@ -55,17 +55,25 @@ function App() {
   // -- checks for win
   // accepts a player object and checks for true on all winning permutations
   // for that player
+  // we return true to correctly check for a win before checking for a draw
+  // because otherwise draw would get called before the win
   let checkWin = (player) => {
     let { one, two, three, four, five, six, seven, eight, nine} = player
     if ( (one && two && three) || (four && five && six) || (seven && eight && nine) || // check rows
       (one && four && seven) || (two && five && eight ) || (three && six && nine ) || // check columns
       (one && five && nine) || (seven && five && three) ) { // check diagonals
         setGame({...game, winningPlayer: player.name, isOver: true})
-
-        // setTimeout(()=> {
-        //   setGame({...game, showReplay: true})
-        // }, 2000) // is this firing before the setGame updates or something? second time this has happened
+        return true
     }
+  }
+
+  // if there are no spaces that aren't taken and nobody won, it's a draw
+  let checkDraw = () => {
+    if (!Object.values(grid).some(value => {
+      console.log(value)
+      return value === ''
+    }))
+      setGame({...game, winningPlayer: 'nobody', isOver: true})
   }
 
   let resetCurrentGame = () => {
@@ -100,23 +108,22 @@ function App() {
   // -- useEffect on turn state
   // every time there's a new turn, we want to check to see if someone
   // won the game
-  // PLEASE NOTE: dealt with something where calling checkWin() in the
-  // click handler was firing before the player object was updated.
-  // Moved checkWin() into this useEffect, and reversed the % logic because 
-  // at this point turn has already been incremented by 1
+  // PLEASE NOTE: reversed the % logic because at this point turn has 
+  // already been incremented by 1
   useEffect(() => {
+    let over = false
     if (turn % 2 === 1)
-      checkWin(playerOne)
+      over = checkWin(playerOne)
     else if (turn % 2 === 0)
-      checkWin(playerTwo)
-    else
-      console.log(`somethin else wrong`)
+      over = checkWin(playerTwo)
+    if (!over)
+      checkDraw()
   }, [turn])
 
   useEffect(()=> {
     let cleanup
     if (game.isOver) {
-    cleanup =  setTimeout(()=> {
+      cleanup =  setTimeout(()=> {
           setGame({...game, showReplay: true})
         }, 2000)
     }
@@ -144,7 +151,7 @@ function App() {
         <div className="header-container">
           {!game.isOver ? <><div className="game-name"><p>Tic Tac Toe</p></div>
           <div className="game-status"><p>It's {game.playerTurn}'s Turn</p></div></> : 
-          <div className="game-name"><h1>{game.winningPlayer} wins!!!</h1></div>}
+          <div className="game-name"><h1>{game.winningPlayer} wins</h1></div>}
         </div>
         <div className="just-lines">
           <div className="grid-container">
@@ -160,7 +167,7 @@ function App() {
       return (
       <div className="App">
         <div className="replay-container">
-          <h1>{game.winningPlayer} wins!!</h1>
+          <h1>{game.winningPlayer} won the game</h1>
           <h2>Would players {playerOne.name} and {playerTwo.name} like to play again?</h2>
           <div className="buttons">
             <button onClick={resetCurrentGame}>Yes</button>
