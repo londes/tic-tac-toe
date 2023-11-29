@@ -15,6 +15,10 @@
   font-size: 2em;
 }
 
+.header-container > * {
+  margin: 0 10vw 0 10vw;
+}
+
 .just-lines {
   margin: auto;
   background-color: darkgrey;
@@ -37,4 +41,22 @@
   width: 190px;
   background-color: white;
   font-size: 9em;
+}
+
+.replay-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.buttons > * {
+  width: 10vw;
+  height: 5vw;
+  margin-top: 2vw;
 }

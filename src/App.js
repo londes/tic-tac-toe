@@ -68,10 +68,39 @@ function App() {
     }
   }
 
+  let resetCurrentGame = () => {
+    setGame({
+      isStarted: true,
+      isOver: false,
+      isDraw: false,
+      playerTurn: playerOne.name,
+      playerOneCreated: true,
+      playerTwoCreated: true,
+      winningPlayer: '',
+      showReplay: false
+    })
+    setGrid({
+      one: '',
+      two: '',
+      three: '',
+      four: '',
+      five: '',
+      six: '',
+      seven: '',
+      eight: '',
+      nine: '',
+    })
+    setPlayerOne(new Player(playerOne.name, playerOne.symbol, true))
+    setPlayerTwo(new Player(playerTwo.name, playerTwo.symbol, false))
+    console.log(playerOne)
+    console.log(playerTwo)
+    console.log(game)
+  }
+
   // -- useEffect on turn state
   // every time there's a new turn, we want to check to see if someone
   // won the game
-  // PLEASE NOTE: dealt with a weird bug where calling checkWin() in the
+  // PLEASE NOTE: dealt with something where calling checkWin() in the
   // click handler was firing before the player object was updated.
   // Moved checkWin() into this useEffect, and reversed the % logic because 
   // at this point turn has already been incremented by 1
@@ -81,8 +110,18 @@ function App() {
     else if (turn % 2 === 0)
       checkWin(playerTwo)
     else
-      console.log(`somethin else wrong :cringe:`)
+      console.log(`somethin else wrong`)
   }, [turn])
+
+  useEffect(()=> {
+    let cleanup
+    if (game.isOver) {
+    cleanup =  setTimeout(()=> {
+          setGame({...game, showReplay: true})
+        }, 2000)
+    }
+    return () => clearTimeout(cleanup)
+  }, [game])
 
   // if game isn't ready, render start screen and collect info
   if (!game.isStarted)
@@ -99,23 +138,37 @@ function App() {
 
     </div>)
   // if game is ready, render grid and play
-  else if (game.isStarted)
+  else if (game.isStarted && !game.showReplay)
     return (
       <div className="App">
         <div className="header-container">
-          {!game.isOver ? <><div className="game-name"><p>Tic Tac Toe</p></div><div className="game-status"><p>It's {game.playerTurn}'s Turn</p></div></> : <div className="game-name"><h1>{game.winningPlayer} wins!!!</h1></div>}
+          {!game.isOver ? <><div className="game-name"><p>Tic Tac Toe</p></div>
+          <div className="game-status"><p>It's {game.playerTurn}'s Turn</p></div></> : 
+          <div className="game-name"><h1>{game.winningPlayer} wins!!!</h1></div>}
         </div>
         <div className="just-lines">
           <div className="grid-container">
-            {Object.keys(grid).map((number,idx) => <GridSquare style='grid-square' id={number} value={grid[number]} click={clickHandle} key={idx}/>)}
+            {Object.keys(grid).map((number, idx) => <GridSquare style='grid-square' id={number} value={grid[number]} click={clickHandle} key={idx}/>)}
           </div>
         </div>
       </div>
     )
 
-  // if game is over, render game over
-  // // maybe render a game over thing and wait a few seconds before 
-  // // swapping 
+  // if game is over, render the replay prompt after 2s, see useEffect() 
+  // on game above with the setTimeout for reference
+  else if (game.showReplay)
+      return (
+      <div className="App">
+        <div className="replay-container">
+          <h1>{game.winningPlayer} wins!!</h1>
+          <h2>Would players {playerOne.name} and {playerTwo.name} like to play again?</h2>
+          <div className="buttons">
+            <button onClick={resetCurrentGame}>Yes</button>
+            <button>No</button>
+          </div>
+        </div>
+      </div>
+      )
 }
 
 export default App;
