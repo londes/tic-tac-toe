@@ -1,4 +1,3 @@
 # tic-tac-toe
-tic tac toe
 =======
-# Put those Xs and Os on that board
+try getting 3 in a row against your opponent 🙃
