@@ -51,21 +51,35 @@
   font-size: 2em;
 }
 
-.message {
+.not-ready {
   color: red;
+}
+
+.ready {
+  color: green;
 }
 
 .header-container {
   display: flex;
   justify-content: space-around;
+  align-items: center;
   width: 80vw;
   font-size: 2em;
+}
+
+.game-name {
+  width: 30vw;
 }
 
 .game-status {
   display: flex;
   justify-content: flex-end;
-  width: 40vw;
+  width: 50vw;
+  font-size: .8em;
+}
+
+.game-status > * {
+  margin-left: 1.5vw;
 }
 
 .header-container > * {

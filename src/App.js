@@ -2,12 +2,13 @@ import './App.css';
 
 import React, { useState, useEffect } from 'react'
 import Player from './Player'
-import GridSquare from './components/GridSquare'
+import GameSetup from './views/GameSetup';
+import Game from './views/Game'
+import GameOver from './views/GameOver'
 
 function App() {
 
   // declare our game objects
-
   let [game, setGame] = useState ({
     isStarted: false,
     isOver: false,
@@ -29,8 +30,6 @@ function App() {
   })
   let [playerOne, setPlayerOne] = useState(new Player(``, ``, true))
   let [playerTwo, setPlayerTwo] = useState(new Player(``, ``, false))
-  // let [playerOne, setPlayerOne] = useState(new Player('will', `🏀`, true))
-  // let [playerTwo, setPlayerTwo] = useState(new Player('jeb', `🌴`, false))
   let [turn, setTurn] = useState(0)
   let [symbols, setSymbols] = useState([`X`, `O`, `🏀`, `🌴`, `😃`, `👹`, `🐳`])
   let [message, setMessage] = useState('')
@@ -90,17 +89,7 @@ function App() {
       winningPlayer: '',
       showReplay: false
     })
-    setGrid({
-      one: '',
-      two: '',
-      three: '',
-      four: '',
-      five: '',
-      six: '',
-      seven: '',
-      eight: '',
-      nine: '',
-    })
+    clearGrid()
     setTurn(0)
     setPlayerOne(new Player(playerOne.name, playerOne.symbol, true))
     setPlayerTwo(new Player(playerTwo.name, playerTwo.symbol, false))
@@ -117,6 +106,16 @@ function App() {
       winningPlayer: '',
       showReplay: false
     })
+    clearGrid()
+    setPlayerOne(new Player('', '', true))
+    setPlayerTwo(new Player('', '', false))
+    setSymbols([`X`, `O`, `🏀`, `🌴`, `😃`, `👹`, `🐳`])
+    setMessage('')
+    setTurn(0)
+  }
+
+  // we're doing this in several places so let's just make it a function
+  let clearGrid = () => {
     setGrid({
       one: '',
       two: '',
@@ -128,14 +127,9 @@ function App() {
       eight: '',
       nine: '',
     })
-    setPlayerOne(new Player('', '', true))
-    setPlayerTwo(new Player('', '', false))
-    setSymbols([`X`, `O`, `🏀`, `🌴`, `😃`, `👹`, `🐳`])
-    setMessage('')
-    setTurn(0)
   }
 
-  // lets each player choose a symbol 
+  // onClick for the symbol buttons, this lets each player choose a symbol
   let setSymbol = (e) => {
     if (e.target.attributes.player.value === "one" && !playerOne.symbol) {
       setPlayerOne({...playerOne, symbol: symbols[e.target.attributes.loc.value]})
@@ -148,14 +142,14 @@ function App() {
   }
 
   // since the setState calls happen asynchronously, we have to
-  // watch player 1's name in the form to make sure it's tracked 
+  // watch playerOne's name in the form to make sure it's tracked 
   // correctly in the game object for the first turn
   let changeHandler = (e) => {
     setPlayerOne({...playerOne, name: e.target.value})
   }
 
   // some brief form validation, if we have both player names
-  // and symbols we go
+  // and symbols we go and play
   let submitForm = (e) => {
     e.preventDefault()
     if (!playerOne.symbol || !playerTwo.symbol)
@@ -163,17 +157,13 @@ function App() {
     else if (e.target[0].value === '' || e.target[1].value === '')
       setMessage('Both players need to input a name')
     else {
-      console.log(e.target[0].value)
-      console.log(e.target[1].value)
       setPlayerOne({...playerOne, name: e.target[0].value})
       setPlayerTwo({...playerTwo, name: e.target[1].value})
       setMessage('Get ready to play!')
       setTimeout (()=> {
         setGame({...game, isStarted: true, playerTurn: playerOne.name})
       }, 3000)
-      
     }
-      
   }
 
   // -- useEffect on turn state
@@ -204,81 +194,27 @@ function App() {
   }, [game])
 
   // -- Render function
-  // debated using views and/or components but it's pretty simple right?
-  // famous last words.
-  // anyway --
+  // renders the GameStart View
   // if game isn't ready, render start screen and collect info
   if (!game.isStarted)
     return (
-    <div className="App">
-      <div><h1>Hello, and welcome to Tic Tac Toe</h1></div>
-      <div><h2>The game requires two players.</h2></div>
+      <GameSetup playerOne={playerOne} playerTwo={playerTwo} symbols={symbols} setSymbol={setSymbol} change={changeHandler} submit={submitForm} message={message}/>
+    )
 
-      <form className="player-form" onSubmit={submitForm}>
-        <div className="player-container">
-          <div className="name-input">
-            <div>Player 1:</div>
-            <input placeholder='Please input your name' value={playerOne.name} onChange={changeHandler}></input>
-          </div>
-          <div className="button-input">
-          {playerOne.symbol ? 
-            <div className="chosen-symbol">{playerOne.symbol}</div> : 
-            <div className="buttons-container">
-              <p>Please select your symbol:</p> 
-              <div className="buttons-buttons">{symbols.map((symbol, idx) => <button type="button" onClick={setSymbol} loc={idx} player="one" key={idx}>{symbol}</button>)}</div>
-            </div>}
-          </div>
-        </div>
-        <div className="player-container">
-          <div className="name-input">
-            <div>Player 2:</div>
-            <input placeholder='Please input your name'></input>
-          </div>
-          <div className="button-input">
-            {playerTwo.symbol ? 
-            <div className="chosen-symbol">{playerTwo.symbol}</div> : 
-            <div className="buttons-container">
-              <p>Please select your symbol:</p> 
-              <div className="buttons-buttons">{symbols.map((symbol, idx) => <button type="button" onClick={setSymbol} loc={idx} player="two" key={idx}>{symbol}</button>)}</div>
-            </div>}
-          </div>
-        </div>
-        <button className="submit-button" type="submit">Submit</button>
-        <h3 className="message">{message}</h3>
-      </form>
-
-    </div>)
+  // -- Render function
+  // renders the Game view
   // if game is ready, render grid and play
   else if (game.isStarted && !game.showReplay)
     return (
-      <div className="App">
-        <div className="header-container">
-          {!game.isOver ? <><div className="game-name"><p>Tic Tac Toe</p></div>
-          <div className="game-status"><p>It's {game.playerTurn}'s Turn</p><p>{game.playerTurn === playerOne.name ? playerOne.symbol : playerTwo.symbol}</p></div></> : 
-          <div className="game-name"><h1>{game.winningPlayer} wins</h1></div>}
-        </div>
-        <div className="just-lines">
-          <div className="grid-container">
-            {Object.keys(grid).map((number, idx) => <GridSquare style='grid-square' id={number} value={grid[number]} click={clickHandle} key={idx}/>)}
-          </div>
-        </div>
-      </div>
+      <Game game={game} playerOne={playerOne} playerTwo={playerTwo} grid={grid} click={clickHandle}/>
     )
 
+  // -- Render function
   // if game is over, render the replay prompt after 2s, see useEffect() 
   // on game above with the setTimeout for reference
   else if (game.showReplay)
       return (
-      <div className="App">
-        <div className="replay-container">
-          <h1>{game.winningPlayer} won the game</h1>
-          <h2>Would players {playerOne.name} and {playerTwo.name} like to play again?</h2>
-          <div className="buttons">
-            <button onClick={resetCurrentGame}>Yes</button>
-            <button onClick={resetGame}>No</button>
-          </div>
-        </div>
-      </div>
+        <GameOver game={game} playerOne={playerOne} playerTwo={playerTwo} resetCurrentGame={resetCurrentGame} resetGame={resetGame}/>
       )
 }
 
